@@ -2,8 +2,6 @@
 
 It works with single layer and a column name (test with Openlayers 10.6.0)
 
-We mainly borrowed code from [ol-geocoder](https://github.com/Dominique92/ol-geocoder) for the UI part.
-
 <img src="demo-ol-search-layer.gif" alt="Demo Search Layer OpenLayers 3" title="Demo Search Layer OpenLayers 3">
 
 ## Demo
@@ -58,3 +56,7 @@ map.addControl(searchLayer);
 ## License
 
 MIT
+
+## Thanks
+
+We mainly borrowed code from [ol-geocoder](https://github.com/Dominique92/ol-geocoder) for the UI part.
