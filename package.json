@@ -1,30 +1,30 @@
 {
-  "name": "ol3-search",
+  "name": "ol-search",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "http-server",
-    "lint:js": "eslint src/js/ examples/control-ol3-search-layer.js",
-    "standalone:browserify:debug": "browserify -s ol.SearchLayer src/js/index.js > dist/ol3-search-layer.js",
-    "standalone:browserify": "browserify -s ol.SearchLayer src/js/index.js |uglifyjs > dist/ol3-search-layer.min.js",
-    "build:css": "cleancss src/css/ol3-search-layer.css > dist/ol3-search-layer.min.css",
-    "build:css:debug": "cp src/css/ol3-search-layer.css dist/ol3-search-layer.css",
+    "lint:js": "eslint src/js/ examples/control-ol-search-layer.js",
+    "standalone:browserify:debug": "browserify -s ol.SearchLayer src/js/index.js > dist/ol-search-layer.js",
+    "standalone:browserify": "browserify -s ol.SearchLayer src/js/index.js |uglifyjs > dist/ol-search-layer.min.js",
+    "build:css": "cleancss src/css/ol-search-layer.css > dist/ol-search-layer.min.css",
+    "build:css:debug": "cp src/css/ol-search-layer.css dist/ol-search-layer.css",
     "prod": "npm run standalone:browserify && npm run build:css",
     "debug": "npm run standalone:browserify:debug && npm run build:css:debug",
     "all": "npm run prod && npm run debug"
   },
-  "browser": "dist/ol3-search-layer.js",
+  "browser": "dist/ol-search-layer.js",
   "style": [
-    "css/ol3-search-layer.css"
+    "css/ol-search-layer.css"
   ],
   "keywords": [
     "openlayers",
     "search",
     "horsey"
   ],
-  "author": "Thomas Gratier",
+  "author": "Andrea Ordonselli",
   "license": "MIT",
   "devDependencies": {
     "browserify": "^13.1.0",
