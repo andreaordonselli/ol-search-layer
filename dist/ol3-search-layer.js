@@ -1,139 +1,3 @@
-(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.ol || (g.ol = {})).SearchLayer = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-var utils = require('./utils');
-
-function SearchLayer(optOptions) {
-  var horseyComponent;
-  var select;
-  var options = optOptions || {};
-  if (optOptions.layer) {
-    options.layer = optOptions.layer;
-  } else {
-    throw new Error('error');
-  }
-  options.map = optOptions.map;
-
-  var source;
-  if (options.layer instanceof ol.layer.Image &&
-      options.layer.getSource() instanceof ol.source.ImageVector) {
-    source = options.layer.getSource().getSource();
-  } else if (options.layer instanceof ol.layer.Vector) {
-    source = options.layer.getSource();
-  }
-  options.colName = optOptions.colName;
-
-  var button = document.createElement('button');
-  var toogleHideShowInput = function() {
-    var input = document.querySelector('form > .search-layer-input-search');
-    if (utils.hasClass(input, 'search-layer-collapsed')) {
-      utils.removeClass(input, 'search-layer-collapsed');
-    } else {
-      input.value = '';
-      utils.addClass(input, 'search-layer-collapsed');
-      horseyComponent.hide();
-      select.getFeatures().clear();
-    }
-  };
-
-  button.addEventListener('click', toogleHideShowInput, false);
-  button.addEventListener('touchstart', toogleHideShowInput, false);
-
-  var form = document.createElement('form');
-  form.setAttribute('id', 'random');
-  form.onsubmit = function(){return false};
-  // form.setAttribute('action', 'javascript:void(0);');
-
-  var input = document.createElement('input');
-  input.setAttribute('id', 'ol-search-input');
-  var defaultInputClass = ['search-layer-input-search'];
-  if (optOptions.collapsed) {
-    defaultInputClass.push('search-layer-collapsed');
-  }
-  input.setAttribute('class', defaultInputClass.join(' '));
-  input.setAttribute('placeholder', 'Search ...');
-  input.setAttribute('type', 'text');
-
-  form.appendChild(input);
-
-  var element = document.createElement('div');
-  element.className = 'search-layer ol-unselectable ol-control';
-
-  element.appendChild(button);
-  element.appendChild(form);
-
-  ol.control.Control.call(this, {
-    element: element,
-    target: options.target
-  });
-
-  select = new ol.interaction.Select({
-    id: options.selectId || 'defaultSearchLayer',
-    layers: [options.layer],
-    condition: ol.events.condition.never
-  });
-
-  var map = options.map;
-
-  map.addInteraction(select);
-
-  var typesToZoomToExtent = [
-    'MultiPoint',
-    'LineString',
-    'MultiLineString',
-    'MultiPolygon',
-    'Polygon'
-  ];
-
-  var typesToZoomToCenterAndZoom = [
-    'Point'
-  ];
-  var returnHorsey = function(input, source, map, select, options) {
-    horsey(input, {
-      source: [{
-        list: source.getFeatures().map(function(el, i) {
-          if (el.getId() === undefined) {
-            el.setId(i);
-          }
-          return {
-            text: el.get(options.colName),
-            value: el.getId() // If GeoJSON has an id
-          };
-        })
-      }],
-      getText: 'text',
-      getValue: 'value',
-      predictNextSearch: function(info) {
-        var feat = source.getFeatureById(info.selection.value);
-        var featType = feat.getGeometry().getType();
-        if (typesToZoomToCenterAndZoom.indexOf(featType) !== -1) {
-          var newCenter = ol.extent.getCenter(feat.getGeometry().getExtent());
-          map.getView().setCenter(newCenter);
-          map.getView().setZoom(options.zoom || 12);
-        } else if (typesToZoomToExtent.indexOf(featType) !== -1) {
-          map.getView().fit(feat.getGeometry().getExtent(), map.getSize());
-        }
-
-        select.getFeatures().clear();
-        select.getFeatures().push(feat);
-      }
-    });
-  }
-  if (source.getState() === 'ready') {
-    horseyComponent = returnHorsey(input, source, map, select, options);
-  }
-  source.once('change', function(e) {
-    if (source.getState() === 'ready') {
-      horseyComponent = returnHorsey(input, source, map, select, options);
-    }
-  });
-}
-
-ol.inherits(SearchLayer, ol.control.Control);
-
-module.exports = SearchLayer;
-
-},{"./utils":2}],2:[function(require,module,exports){
-'use strict';
-
 function hasClass(el, cls) {
   return el.className && new RegExp('(\\s|^)' +
     cls + '(\\s|$)').test(el.className);
@@ -155,11 +19,137 @@ function removeClass(elem, className) {
   }
 }
 
-module.exports = {
-  addClass: addClass,
-  hasClass: hasClass,
-  removeClass: removeClass
-};
 
-},{}]},{},[1])(1)
-});
+class SearchLayer extends ol.control.Control {
+  constructor(optOptions) {
+    const horseyComponentRef = { current: null };
+    const selectRef = { current: null };
+
+    const options = optOptions || {};
+    if (!options.layer) {
+      throw new Error('Missing layer in options');
+    }
+
+    options.map = optOptions.map;
+    options.colName = optOptions.colName;
+
+    // Detect vector source
+    let source;
+    if (options.layer instanceof ol.layer.Image &&
+        options.layer.getSource() instanceof ol.source.ImageVector) {
+      source = options.layer.getSource().getSource();
+    } else if (options.layer instanceof ol.layer.Vector) {
+      source = options.layer.getSource();
+    }
+
+    // Create button
+    const button = document.createElement('button');
+    const toggleHideShowInput = () => {
+      const input = document.querySelector('form > .search-layer-input-search');
+      if (hasClass(input, 'search-layer-collapsed')) {
+        removeClass(input, 'search-layer-collapsed');
+      } else {
+        input.value = '';
+        addClass(input, 'search-layer-collapsed');
+        if (horseyComponentRef.current) {
+          horseyComponentRef.current.hide();
+        }
+        if (selectRef.current) {
+          selectRef.current.getFeatures().clear();
+        }
+      }
+    };
+
+    button.addEventListener('click', toggleHideShowInput, false);
+    button.addEventListener('touchstart', toggleHideShowInput, false);
+
+    // Create input
+    const form = document.createElement('form');
+    form.setAttribute('id', 'random');
+    form.onsubmit = undefined;
+
+    const input = document.createElement('input');
+    input.setAttribute('id', 'ol-search-input');
+    const defaultInputClass = ['search-layer-input-search'];
+    if (optOptions.collapsed) {
+      defaultInputClass.push('search-layer-collapsed');
+    }
+    input.setAttribute('class', defaultInputClass.join(' '));
+    input.setAttribute('placeholder', 'Search ...');
+    input.setAttribute('type', 'text');
+    form.appendChild(input);
+
+    // Build control element
+    const element = document.createElement('div');
+    element.className = 'search-layer ol-unselectable ol-control';
+    element.appendChild(button);
+    element.appendChild(form);
+
+    // Initialize base class
+    super({
+      element: element,
+      target: options.target
+    });
+
+    // Create select interaction
+    const select = new ol.interaction.Select({
+      id: options.selectId || 'defaultSearchLayer',
+      layers: [options.layer],
+      condition: ol.events.condition.never
+    });
+
+    selectRef.current = select;
+
+    const map = options.map;
+    map.addInteraction(select);
+
+    // Setup horsey autocomplete
+    const typesToZoomToExtent = [
+      'MultiPoint', 'LineString', 'MultiLineString', 'MultiPolygon', 'Polygon'
+    ];
+    const typesToZoomToCenterAndZoom = ['Point'];
+
+    const returnHorsey = (input, source, map, select, options) => {
+      return horsey(input, {
+        source: [{
+          list: source.getFeatures().map((el, i) => {
+            if (el.getId() === undefined) {
+              el.setId(i);
+            }
+            return {
+              text: el.get(options.colName),
+              value: el.getId()
+            };
+          })
+        }],
+        getText: 'text',
+        getValue: 'value',
+        predictNextSearch: function(info) {
+          const feat = source.getFeatureById(info.selection.value);
+          const featType = feat.getGeometry().getType();
+
+          if (typesToZoomToCenterAndZoom.includes(featType)) {
+            const newCenter = ol.extent.getCenter(feat.getGeometry().getExtent());
+            map.getView().setCenter(newCenter);
+            map.getView().setZoom(options.zoom || 12);
+          } else if (typesToZoomToExtent.includes(featType)) {
+            map.getView().fit(feat.getGeometry().getExtent(), map.getSize());
+          }
+
+          select.getFeatures().clear();
+          select.getFeatures().push(feat);
+        }
+      });
+    };
+
+    if (source.getState() === 'ready') {
+      horseyComponentRef.current = returnHorsey(input, source, map, select, options);
+    }
+
+    source.once('change', () => {
+      if (source.getState() === 'ready') {
+        horseyComponentRef.current = returnHorsey(input, source, map, select, options);
+      }
+    });
+  }
+}
