@@ -1,41 +1,43 @@
-var layerImage = new ol.layer.Image({
-  source: new ol.source.ImageVector({
-    source: new ol.source.Vector({
-      url: 'http://rawgit.com/openlayers/openlayers.github.io/master/en/v3.18.2/examples/data/geojson/countries.geojson',
-      format: new ol.format.GeoJSON()
+// Define vector layer with GeoJSON
+const vectorLayer = new ol.layer.Vector({
+  source: new ol.source.Vector({
+    url: 'https://openlayers.org/en/v4.6.5/examples/data/geojson/countries.geojson',
+    format: new ol.format.GeoJSON()
+  }),
+  style: new ol.style.Style({
+    fill: new ol.style.Fill({
+      color: 'rgba(255, 255, 255, 0.6)'
     }),
-    style: new ol.style.Style({
-      fill: new ol.style.Fill({
-        color: 'rgba(255, 255, 255, 0.6)'
-      }),
-      stroke: new ol.style.Stroke({
-        color: '#319FD3',
-        width: 1
-      })
+    stroke: new ol.style.Stroke({
+      color: '#319FD3',
+      width: 1
     })
   })
 });
 
-var map = new ol.Map({
+// Create map with OSM + vector layer
+const map = new ol.Map({
+  target: 'map',
   layers: [
     new ol.layer.Tile({
       source: new ol.source.OSM()
     }),
-    layerImage
+    vectorLayer
   ],
-  target: 'map',
   view: new ol.View({
     center: [0, 0],
     zoom: 1
   })
 });
 
-var searchLayer = new ol.SearchLayer({
-  layer: layerImage,
-  colName: 'name',
-  zoom: 10,
+// Initialize your updated SearchLayer class (from previous answer)
+const searchControl = new SearchLayer({
+  layer: vectorLayer,
+  colName: 'name',  // this should match a property in the GeoJSON
+  zoom: 4,
   collapsed: true,
   map: map
 });
 
-map.addControl(searchLayer);
+// Add control to map
+map.addControl(searchControl);
