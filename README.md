@@ -8,7 +8,7 @@ We mainly borrowed code from [ol-geocoder](https://github.com/Dominique92/ol-geo
 
 ## Demo
 
-You can see the demo in action using [RawGit](http://rawgit.com/andreaordonselli/ol-search-layer/master/examples/control-ol-search-layer.html)
+You can see the demo in action using [RawGit](https://andreaordonselli.github.io/ol-search-layer/examples/control-ol-search-layer.html)
 
 ## Dependency
 
