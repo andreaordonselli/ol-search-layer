@@ -1,6 +1,6 @@
 # OpenLayers Control for layer Search
 
-It works with single layer and a column name (test with openlayers 10.6.0)
+It works with single layer and a column name (test with Openlayers 10.6.0)
 
 We mainly borrowed code from [ol-geocoder](https://github.com/Dominique92/ol-geocoder) for the UI part.
 
