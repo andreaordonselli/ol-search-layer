@@ -48,7 +48,7 @@ var searchLayer = new ol.SearchLayer({
   zoom: 10,
   collapsed: true,
   map: map,
-  maxResults: 5,  // optional - if not set show 10 result
+  maxResults: 50,  // optional - if not set show 10 result
 });
 
 map.addControl(searchLayer);
