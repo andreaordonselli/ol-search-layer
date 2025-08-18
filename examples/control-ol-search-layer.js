@@ -36,7 +36,8 @@ const searchControl = new SearchLayer({
   colName: 'name',  // this should match a property in the GeoJSON
   zoom: 4,
   collapsed: true,
-  map: map
+  map: map,
+  maxResult: 5 // optional - if not set show 10 result
 });
 
 // Add control to map
