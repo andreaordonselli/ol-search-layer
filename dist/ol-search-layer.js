@@ -29,6 +29,10 @@ class SearchLayer extends ol.control.Control {
     if (!options.layer) {
       throw new Error('Missing layer in options');
     }
+	
+	// Imposta opzione maxResults di default a 10
+	options.maxResults = (typeof optOptions.maxResults === 'number') ? optOptions.maxResults : 10;
+
 
     options.map = optOptions.map;
     options.colName = optOptions.colName;
@@ -41,6 +45,9 @@ class SearchLayer extends ol.control.Control {
     } else if (options.layer instanceof ol.layer.Vector) {
       source = options.layer.getSource();
     }
+	if (source instanceof ol.source.Cluster) {
+	  source = source.getSource();
+	}
 
     // Create button
     const button = document.createElement('button');
@@ -120,7 +127,7 @@ class SearchLayer extends ol.control.Control {
               text: el.get(options.colName),
               value: el.getId()
             };
-          })
+          }).slice(0, options.maxResults)
         }],
         getText: 'text',
         getValue: 'value',
