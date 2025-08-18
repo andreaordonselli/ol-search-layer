@@ -37,7 +37,7 @@ const searchControl = new SearchLayer({
   zoom: 4,
   collapsed: true,
   map: map,
-  maxResult: 5 // optional - if not set show 10 result
+  maxResults: 5 // optional - if not set show 10 result
 });
 
 // Add control to map
