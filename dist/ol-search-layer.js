@@ -30,9 +30,9 @@ class SearchLayer extends ol.control.Control {
       throw new Error('Missing layer in options');
     }
 	
-	// Imposta opzione maxResults di default a 10
-	options.maxResults = (typeof optOptions.maxResults === 'number') ? optOptions.maxResults : 10;
-
+	options.maxResults = (optOptions && typeof optOptions.maxResults === 'number') 
+	  ? optOptions.maxResults 
+	  : 10;
 
     options.map = optOptions.map;
     options.colName = optOptions.colName;
@@ -127,10 +127,11 @@ class SearchLayer extends ol.control.Control {
               text: el.get(options.colName),
               value: el.getId()
             };
-          }).slice(0, options.maxResults)
+          })
         }],
         getText: 'text',
         getValue: 'value',
+		limit: options.maxResults,
         predictNextSearch: function(info) {
           const feat = source.getFeatureById(info.selection.value);
           const featType = feat.getGeometry().getType();
