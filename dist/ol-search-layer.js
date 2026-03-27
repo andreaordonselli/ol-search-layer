@@ -68,7 +68,7 @@ class SearchLayer extends ol.control.Control {
     };
 
     button.addEventListener('click', toggleHideShowInput, false);
-    button.addEventListener('touchstart', toggleHideShowInput, false);
+    button.addEventListener('pointerup', toggleHideShowInput);
 
     // Create input
     const form = document.createElement('form');
@@ -86,6 +86,11 @@ class SearchLayer extends ol.control.Control {
     input.setAttribute('type', 'text');
     form.appendChild(input);
 
+	// immediate focus on mobile
+	input.addEventListener('touchstart', () => {
+	  input.focus();
+	}, { passive: true });
+
     // Build control element
     const element = document.createElement('div');
     element.className = 'search-layer ol-unselectable ol-control';
@@ -98,6 +103,20 @@ class SearchLayer extends ol.control.Control {
       target: options.target
     });
 
+	// ===============================
+	// MOBILE TOUCH SUPPORT
+	// ===============================
+	// ol does not intercept the tap
+	const stopMapPropagation = (e) => {
+	  e.stopPropagation();
+	};
+	// modern pointer events (desktop + mobile)
+	element.addEventListener('pointerdown', stopMapPropagation, { passive: true });
+	// touch fallback
+	element.addEventListener('touchstart', stopMapPropagation, { passive: true });
+	// mouse fallback
+	element.addEventListener('mousedown', stopMapPropagation);
+	  
     // Create select interaction
     const select = new ol.interaction.Select({
       id: options.selectId || 'defaultSearchLayer',
