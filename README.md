@@ -1,8 +1,8 @@
 # OpenLayers Control for layer Search
 
-It works with single layer and a column name (test with Openlayers 10.6.0)
+It works with single layer and a column name (test with Openlayers 10.8.0)
 
-<img src="demo-ol-search-layer.gif" alt="Demo Search Layer OpenLayers 3" title="Demo Search Layer OpenLayers 3">
+<img src="demo-ol-search-layer.gif" alt="Demo Search Layer OpenLayers 10" title="Demo Search Layer OpenLayers 10">
 
 ## Demo
 
@@ -19,7 +19,7 @@ You have to be aware that we use [horsey](https://github.com/bevacqua/horsey/), 
 ```
 <!-- Insert Horsey CSS link -->
 <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/horsey/4.2.2/horsey.min.css">
-<!-- Insert ol3-search-layer plugin CSS link -->
+<!-- Insert ol-search-layer plugin CSS link -->
 <link rel="stylesheet" href="../dist/ol-search-layer.css">
 ```
 
@@ -28,7 +28,7 @@ After the call to the ol.js script (or your custom build)
 ```
 <!-- Insert Horsey JS script -->
 <script src="//cdnjs.cloudflare.com/ajax/libs/horsey/4.2.2/horsey.min.js"></script>
-<!-- Insert ol3-search-layer plugin JS script -->
+<!-- Insert ol-search-layer plugin JS script -->
 <script src="../dist/ol-search-layer.min.js"></script>
 ```
 
@@ -48,7 +48,8 @@ var searchLayer = new ol.SearchLayer({
   zoom: 10,
   collapsed: true,
   map: map,
-  maxResults: 50,  // optional - if not set show 10 result
+  maxResults: 20,  // optional - if not set show 10 result
+  showOnFocus: false // optional - if true show suggestions immediately
 });
 
 map.addControl(searchLayer);

@@ -1,17 +1,82 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>ol-search-layer</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ol3/3.18.2/ol.css" type="text/css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/horsey/4.2.2/horsey.min.css"  type="text/css">
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@10.8.0/ol.min.css" type="text/css">
+    <link rel="stylesheet" href="horsey.min.css"  type="text/css">
     <link rel="stylesheet" href="../dist/ol-search-layer.css"  type="text/css">
-    <link rel="stylesheet" href="control-ol-search-layer.css"  type="text/css">
+
+    <style>
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      #map {
+        width: 100vw;
+        height: 100vh;
+        min-height: 300px;
+        touch-action: none;
+      }
+    </style>
+
   </head>
   <body>
     <div id="map" class="map"></div>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/ol@10.6.0/dist/ol.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/horsey/4.2.2/horsey.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/ol@10.8.0/dist/ol.min.js"></script>
+    <script src="horsey.min.js"></script>
     <script src="../dist/ol-search-layer.js"></script>
-    <script src="control-ol-search-layer.js"></script>
+    
+    <script>
+      // Define vector layer with GeoJSON
+      const vectorLayer = new ol.layer.Vector({
+        source: new ol.source.Vector({
+          url: 'https://openlayers.org/en/v4.6.5/examples/data/geojson/countries.geojson',
+          format: new ol.format.GeoJSON()
+        }),
+        style: new ol.style.Style({
+          fill: new ol.style.Fill({
+            color: 'rgba(255, 255, 255, 0.6)'
+          }),
+          stroke: new ol.style.Stroke({
+            color: '#319FD3',
+            width: 1
+          })
+        })
+      });
+
+      // Create map with OSM + vector layer
+      const map = new ol.Map({
+        target: 'map',
+        layers: [
+          new ol.layer.Tile({
+            source: new ol.source.OSM()
+          }),
+          vectorLayer
+        ],
+        view: new ol.View({
+          center: [0, 0],
+          zoom: 1
+        })
+      });
+
+      // Initialize your updated SearchLayer class (from previous answer)
+      const searchControl = new SearchLayer({
+        layer: vectorLayer,
+        colName: 'name',  // this should match a property in the GeoJSON
+        zoom: 4,
+        collapsed: true,
+        map: map,
+        maxResults: 20, // optional - if not set show 10 result
+        showOnFocus: false // optional - if true show suggestions immediately
+      });
+
+      // Add control to map
+      map.addControl(searchControl);
+
+    </script>
   </body>
 </html>

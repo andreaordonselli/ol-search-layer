@@ -38,6 +38,8 @@ class SearchLayer extends ol.control.Control {
     options.colName = optOptions.colName;
 
     // Detect vector source
+        // nuovo parametro: mostra suggerimenti al focus/click
+        options.showOnFocus = typeof optOptions.showOnFocus === 'boolean' ? optOptions.showOnFocus : false;
     let source;
     if (options.layer instanceof ol.layer.Image &&
         options.layer.getSource() instanceof ol.source.ImageVector) {
@@ -55,6 +57,15 @@ class SearchLayer extends ol.control.Control {
       const input = document.querySelector('form > .search-layer-input-search');
       if (hasClass(input, 'search-layer-collapsed')) {
         removeClass(input, 'search-layer-collapsed');
+        // Mostra suggerimenti solo se showOnFocus true
+        if (options.showOnFocus && horseyComponentRef.current) {
+          horseyComponentRef.current.hide();
+          setTimeout(() => {
+            if (input === document.activeElement) {
+              horseyComponentRef.current.show();
+            }
+          }, 0);
+        }
       } else {
         input.value = '';
         addClass(input, 'search-layer-collapsed');
@@ -67,8 +78,7 @@ class SearchLayer extends ol.control.Control {
       }
     };
 
-    button.addEventListener('click', toggleHideShowInput, false);
-    button.addEventListener('pointerup', toggleHideShowInput);
+    button.addEventListener('pointerup', toggleHideShowInput, false);
 
     // Create input
     const form = document.createElement('form');
@@ -150,7 +160,8 @@ class SearchLayer extends ol.control.Control {
         }],
         getText: 'text',
         getValue: 'value',
-		limit: options.maxResults,
+        limit: options.maxResults,
+        blankSearch: !!options.showOnFocus,
         predictNextSearch: function(info) {
           const feat = source.getFeatureById(info.selection.value);
           const featType = feat.getGeometry().getType();
@@ -171,11 +182,27 @@ class SearchLayer extends ol.control.Control {
 
     if (source.getState() === 'ready') {
       horseyComponentRef.current = returnHorsey(input, source, map, select, options);
+      // if required, show suggestions on focus/click
+      if (options.showOnFocus) {
+        input.addEventListener('focus', function showOnFocusHandler() {
+          if (horseyComponentRef.current) horseyComponentRef.current.show();
+        });
+        input.addEventListener('click', function showOnClickHandler() {
+          if (horseyComponentRef.current) horseyComponentRef.current.show();
+        });
+      }
     }
-
     source.once('change', () => {
       if (source.getState() === 'ready') {
         horseyComponentRef.current = returnHorsey(input, source, map, select, options);
+        if (options.showOnFocus) {
+          input.addEventListener('focus', function showOnFocusHandler() {
+            if (horseyComponentRef.current) horseyComponentRef.current.show();
+          });
+          input.addEventListener('click', function showOnClickHandler() {
+            if (horseyComponentRef.current) horseyComponentRef.current.show();
+          });
+        }
       }
     });
   }
