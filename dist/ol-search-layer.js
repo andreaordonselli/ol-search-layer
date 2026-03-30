@@ -36,10 +36,7 @@ class SearchLayer extends ol.control.Control {
 
     options.map = optOptions.map;
     options.colName = optOptions.colName;
-
-    // Detect vector source
-        // nuovo parametro: mostra suggerimenti al focus/click
-        options.showOnFocus = typeof optOptions.showOnFocus === 'boolean' ? optOptions.showOnFocus : false;
+    options.showOnFocus = typeof optOptions.showOnFocus === 'boolean' ? optOptions.showOnFocus : false;
     let source;
     if (options.layer instanceof ol.layer.Image &&
         options.layer.getSource() instanceof ol.source.ImageVector) {
